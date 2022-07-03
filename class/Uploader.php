@@ -77,7 +77,8 @@ class Uploader
                 $this->setMessage("Destination is not writable !");
             else
             {
-                if(move_uploaded_file($_FILES[$fileBrowse]["tmp_name"],$this->destinationPath.'/'.$ext.'/'.$this->uploadName))
+                $upload=$this->destinationPath.'/'.$ext.'/'.time().$this->uploadName;
+                if(move_uploaded_file($_FILES[$fileBrowse]["tmp_name"],$upload))
                 {
                     $result =   true;
                 }
@@ -87,7 +88,7 @@ class Uploader
                 }
             }
         }
-        $this->uploadName=$this->destinationPath.'/'.$ext.'/'.$this->uploadName;
+        $this->uploadName=$upload;
         return $result;
     }
 
