@@ -5,7 +5,7 @@ class Uploader
     private $errorMessage;
     private $extensions;
     private $maxSize;
-    private $maxRowCount;
+    private $maxRowCount=20000;
     private $uploadName;
     public $name='Uploader';
 
@@ -40,10 +40,12 @@ class Uploader
     function uploadFile($fileBrowse){
         $result =   false;
         $size   =   $_FILES[$fileBrowse]["size"];
-        $size   =   $_FILES[$fileBrowse]["size"];
+        ($size===0)?die():'';
         $name   =   $_FILES[$fileBrowse]["name"];
+        $rowCount   =   count(file($_FILES[$fileBrowse]["tmp_name"]));
         $ext    =   pathinfo($name,PATHINFO_EXTENSION);
-
+//        print_r([$size,$name,$rowCount,$ext]);
+//        die();
         $this->uploadName=  $name;
 
         if(empty($name))
@@ -54,7 +56,15 @@ class Uploader
         {
             $this->setMessage("Too large file !");
         }
-        else if(in_array($ext,$this->extensions))
+        else if($rowCount>$this->maxRowCount)
+        {
+            $this->setMessage("The number of lines in the file is more than 20k.");
+        }
+        else if(!in_array($ext,$this->extensions))
+        {
+            $this->setMessage("Invalid file format !");
+        }
+        else
         {
             if(!is_dir($this->destinationPath))
                 mkdir($this->destinationPath);
@@ -77,10 +87,7 @@ class Uploader
                 }
             }
         }
-        else
-        {
-            $this->setMessage("Invalid file format !");
-        }
+        $this->uploadName=$this->destinationPath.'/'.$ext.'/'.$this->uploadName;
         return $result;
     }
 
